@@ -29,6 +29,14 @@ async function handleRequest(request) {
   // return new Response(json, {
   //   headers: {'Content-Type': 'application/json'}
   // })
+  // async function eventHandler(event) {
+  //   // fetch can be awaited here since `event.respondWith()` waits for the Promise it receives to settle
+  //   const resp = await fetch(event.request)
+  //   return resp
+  // }
+
+  const response = await fetch('https://static-links-page.signalnerve.workers.dev');
+  return response
 
   return new Response('Hello worker!', {
     headers: { 'content-type': 'text/plain' },
