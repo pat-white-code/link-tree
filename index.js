@@ -75,9 +75,8 @@ async function handleRequest(request) {
 
   const response = await fetch('https://static-links-page.signalnerve.workers.dev');
 
-  return rewriter(response)
-  // return new Response('Hello worker!', {
-  //   headers: { 'content-type': 'text/plain' },
-  // })
+  return new Response(rewriter(response), {
+    headers: {'Content-Type': 'text/html'}
+  });
 }
 
