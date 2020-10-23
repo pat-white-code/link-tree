@@ -1,3 +1,12 @@
+const rewriter = (response) => {
+  return new HTMLRewriter()
+    .on("div#links", new LinksTransformer(data))
+    .on('div#profile', new ProfileTransformer('block'))
+    .on('img#avatar', new ImageTransformer('https://media-exp1.licdn.com/dms/image/C4D35AQHJmyV9bnJCKw/profile-framedphoto-shrink_400_400/0?e=1603468800&v=beta&t=vFunQLREdByBWWLh39p4uACBs5N82lE4XgZ9q5w7E48'))
+    .on('h1#name', new NameTransformer('Patrick White'))
+    .transform(response)
+}
+
 const data = {
   "links": [
     { "name": "Radio Coffee and Beer", "url": "https://www.radiocoffeeandbeer.com/" },
@@ -6,25 +15,30 @@ const data = {
   ]
 }
 
-class ProfileRewriter {
-  constructor(){
+class ProfileTransformer {
+  constructor(display){
+    this.display = display
   }
   async element(element) {
-    element.removeAttribute('style')
-  }
-}
-
-class ProfileName {
-  constructor(){}
-  async element(element) {
-    element.setInnerContent('Patrick White')
+    element.setAttribute('style', `display: ${this.display}`)
   }
 }
 
-class ProfileImage {
-  constructor() {}
+class NameTransformer {
+  constructor(name){
+    this.name = name;
+  }
   async element(element) {
-    element.setAttribute('src', 'https://media-exp1.licdn.com/dms/image/C4D35AQHJmyV9bnJCKw/profile-framedphoto-shrink_400_400/0?e=1603468800&v=beta&t=vFunQLREdByBWWLh39p4uACBs5N82lE4XgZ9q5w7E48')
+    element.setInnerContent(this.name)
+  }
+}
+
+class ImageTransformer {
+  constructor(src) {
+    this.src = src
+  }
+  async element(element) {
+    element.setAttribute('src', this.src)
   }
 }
 
@@ -61,13 +75,7 @@ async function handleRequest(request) {
 
   const response = await fetch('https://static-links-page.signalnerve.workers.dev');
 
-  return new HTMLRewriter()
-    .on("div#links", new LinksTransformer(data))
-    .on('div#profile', new ProfileRewriter())
-    .on('img#avatar', new ProfileImage())
-    .on('h1#name', new ProfileName())
-    .transform(response)
-
+  return rewriter(response)
   // return new Response('Hello worker!', {
   //   headers: { 'content-type': 'text/plain' },
   // })
