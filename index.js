@@ -64,7 +64,8 @@ addEventListener('fetch', event => {
  * @param {Request} request
  */
 async function handleRequest(request) {
-  const linksReg = /.*\/links/
+  // matches: ..../links
+  const linksReg = /.*\/links$/
 
   if(request.url.match(linksReg)) {
     let links = JSON.stringify(data)
