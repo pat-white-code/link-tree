@@ -1,26 +1,36 @@
-// const json = require('./links.json');
-// import json from './links.json';
-// const data = {
-//   "data": [
-//     { "name": "Radio Coffee and Beer", "url": "https://www.radiocoffeeandbeer.com/" },
-//     { "name": "SummerMoon Coffee", "url": "https://https://www.patikacoffee.com/" },
-//     { "name": "Brew & Brew", "url": "https://www.thebrewandbrew.com/" }
-//   ]
-// }
+class ProfileRewriter {
+  constructor(){
+  }
+  async element(element) {
+    element.removeAttribute('style')
+  }
+}
+
+class ProfileName {
+  constructor(){}
+  async element(element) {
+    element.setInnerContent('Patrick White')
+  }
+}
+
+class ProfileImage {
+  constructor() {}
+  async element(element) {
+    element.setAttribute('src', 'https://media-exp1.licdn.com/dms/image/C4D35AQHJmyV9bnJCKw/profile-framedphoto-shrink_400_400/0?e=1603468800&v=beta&t=vFunQLREdByBWWLh39p4uACBs5N82lE4XgZ9q5w7E48')
+  }
+}
 
 class LinksTransformer {
   constructor(links) {
     this.links = links
   }
-  
-  async element(document) {
-    const div = document.getElementById(element);
-    // const ul = document.createElement('ul');
-    this.links.forEach(link => {
-      let a = document.createElement('a');
-      a.href = link.url;
-      a.innerHTML = link.name;
-      div.appendChild(a);
+
+  async element(element) {
+    this.links = JSON.parse(this.links);
+    const {links} = this.links;
+    console.log(links);
+    links.forEach(link => {
+      element.append(`<a href=${link.url}>${link.name}</a>`, {html: true});
     })
   }
 }
@@ -50,8 +60,6 @@ async function handleRequest(request) {
       headers: {'Content-Type': 'application/json'}
     })
   }
-  // console.log(request.url);
-  // console.log(json);
   // return new Response(json, {
   //   headers: {'Content-Type': 'application/json'}
   // })
@@ -66,8 +74,14 @@ async function handleRequest(request) {
   // console.log(res);
 
   // const res = await fetch('localhost:8787/links');
-  console.log(links);
-  return response
+  return new HTMLRewriter()
+  .on("div#links", new LinksTransformer(links))
+  .on('div#profile', new ProfileRewriter())
+  .on('img#avatar', new ProfileImage())
+  .on('h1#name', new ProfileName())
+  .transform(response)
+  // .transform(response)
+  // return rewriter.transform(response);
 
   return new Response('Hello worker!', {
     headers: { 'content-type': 'text/plain' },
