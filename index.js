@@ -1,18 +1,56 @@
-const rewriter = (response) => {
-  return new HTMLRewriter()
-    .on("div#links", new LinksTransformer(data))
-    .on('div#profile', new ProfileTransformer('block'))
-    .on('img#avatar', new ImageTransformer('https://media-exp1.licdn.com/dms/image/C4D35AQHJmyV9bnJCKw/profile-framedphoto-shrink_400_400/0?e=1603468800&v=beta&t=vFunQLREdByBWWLh39p4uACBs5N82lE4XgZ9q5w7E48'))
-    .on('h1#name', new NameTransformer('Patrick White'))
-    .transform(response)
-}
-
 const data = {
   "links": [
     { "name": "Radio Coffee and Beer", "url": "https://www.radiocoffeeandbeer.com/" },
     { "name": "SummerMoon Coffee", "url": "https://https://www.patikacoffee.com/" },
     { "name": "Brew & Brew", "url": "https://www.thebrewandbrew.com/" }
   ]
+}
+
+const social = [
+  {name: "Github", src:'https://simpleicons.org/icons/github.svg', href: 'https://www.github.com/pat-white-code'},
+  {name: "Youtube", src:'https://simpleicons.org/icons/youtube.svg', href: 'https://www.youtube.com/whitepk86'},
+  {name: "Twitter", src:'https://simpleicons.org/icons/twitter.svg', href: 'https://twitter.com/patwhitecode1'}
+]
+
+const rewriter = (response) => {
+  return new HTMLRewriter()
+    .on("div#links", new LinksTransformer(data))
+    .on('div#profile', new ProfileTransformer('block'))
+    .on('img#avatar', new ImageTransformer('https://media-exp1.licdn.com/dms/image/C4D35AQHJmyV9bnJCKw/profile-framedphoto-shrink_400_400/0?e=1603468800&v=beta&t=vFunQLREdByBWWLh39p4uACBs5N82lE4XgZ9q5w7E48'))
+    .on('h1#name', new NameTransformer('Patrick White'))
+    .on('div#social', new SocialTransformer(social))
+    .on('title', new NameTransformer('Patrick White'))
+    .on('body', new BgTransformer("bg-blue-600"))
+    .transform(response)
+}
+
+class BgTransformer {
+  constructor(colorClass) {
+    this.colorClass = colorClass
+  }
+  element(element) {
+    // element.removeAttribute('class')
+    let newClassList = element.getAttribute('class').replace('bg-gray-900', this.colorClass);
+    element.setAttribute('class', newClassList);
+    // element.setAttribute('style', 'bg-color: black')
+  }
+}
+
+class SocialTransformer {
+  constructor(links) {
+    this.links = links
+  }
+  element(element) {
+    let newStyles = element.getAttribute('style').replace('display: none', 'display: block');
+    element.setAttribute('style', newStyles);
+    this.links.forEach(link => {
+      element.append(`
+        <a href=${link.href}>
+          <img src=${link.src}></img>
+        </a>`, 
+        {html: true})
+    })
+  }
 }
 
 class ProfileTransformer {
